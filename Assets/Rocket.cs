@@ -9,11 +9,16 @@ public class Rocket : MonoBehaviour
     private Vector3 initRot;
     private Rigidbody2D rb;
     private Transform tf;
+    private bool isThrusting = false;
     private float force = 1.0f;
     private float forceRate = 5.0f;
     private float maxForce = 30.0f;
     private float rotationRate = 10.0f;
-    public Text velocityLabel;
+    private int points = 0;
+    private float stabilizingTime = 0.0f;
+    private float winTime = 0.0f;
+    private bool waitingForStability = false;
+    public Text scoreLabel;
 
     private void Start()
     {
@@ -23,39 +28,69 @@ public class Rocket : MonoBehaviour
         initRot = this.transform.eulerAngles;
     }
 
+    private void Thrust() {
+        rb.AddRelativeForce(Vector2.up * force);
+
+        if (force < maxForce)
+        {
+            force += Time.deltaTime * forceRate;
+        }
+    }
+
+    public void StartThrust() {
+        isThrusting = true;
+    }
+
+    public void StopThrust() {
+        isThrusting = false;
+    }
+
+    public void TurnLeft() {
+        tf.Rotate(Vector3.forward * rotationRate * Time.deltaTime);
+    }
+
+    public void TurnRight() {
+        tf.Rotate(Vector3.back * rotationRate * Time.deltaTime);
+    }
+
     private void Update()
     {
-        velocityLabel.text = rb.velocity.y.ToString("N1") + " m/s";
-        if (Input.GetKey(KeyCode.Space))
-        {
-            rb.AddRelativeForce(Vector2.up * force);
-
-            if (force < maxForce)
-            {
-                force += Time.deltaTime * forceRate;
-            }
+        if (isThrusting) {
+            Thrust();
         } else {
             force = 0;
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            tf.Rotate(Vector3.forward * rotationRate * Time.deltaTime);
+            TurnLeft();
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            tf.Rotate(Vector3.back * rotationRate * Time.deltaTime);
+            TurnRight();
         }
 
         if (IsUpsideDown() && rb.velocity == Vector2.zero)
         {
             Reset();
         }
+
+        if (waitingForStability) {
+            if (rb.velocity.y < 0.01) {
+                stabilizingTime += Time.deltaTime;
+            }
+
+            if (stabilizingTime > 3) {
+                Reset();
+                WinPoint();
+            }
+        }
     }
 
     public void Reset()
     {
+        stabilizingTime = 0;
         tf.position = initPos;
         tf.eulerAngles = initRot;
         rb.velocity = Vector2.zero;
@@ -67,11 +102,25 @@ public class Rocket : MonoBehaviour
         return 85 < tf.eulerAngles.z && tf.eulerAngles.z < 275;
     }
 
+    private void WinPoint() {
+        points++;
+        scoreLabel.text = points.ToString();
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (System.Math.Abs(rb.velocity.x) > 6 || System.Math.Abs(rb.velocity.y) > 6)
         {
             Reset();
-        }  
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision) {
+        if (collision.collider.tag.Equals("TargetPlatform")) {
+            waitingForStability = true;
+        } else {
+            waitingForStability = false;
+            stabilizingTime = 0;
+        }
     }
 }
