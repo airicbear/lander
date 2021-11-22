@@ -99,6 +99,13 @@ public class Rocket : MonoBehaviour
         rb.angularVelocity = 0;
     }
 
+    public void Restart() {
+        Reset();
+        points = 0;
+        scoreLabel.text = "0";
+        targetPlatform.ChangeLocation();
+    }
+
     private bool IsUpsideDown()
     {
         return 85 < tf.eulerAngles.z && tf.eulerAngles.z < 275;
