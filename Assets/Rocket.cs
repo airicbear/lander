@@ -19,6 +19,7 @@ public class Rocket : MonoBehaviour
     private float winTime = 0.0f;
     private bool waitingForStability = false;
     public Text scoreLabel;
+    public TargetPlatform targetPlatform;
 
     private void Start()
     {
@@ -84,6 +85,7 @@ public class Rocket : MonoBehaviour
             if (stabilizingTime > 3) {
                 Reset();
                 WinPoint();
+                targetPlatform.ChangeLocation();
             }
         }
     }

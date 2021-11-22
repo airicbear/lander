@@ -463,6 +463,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13c65ce1da55b4377acd4e646be228f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnArea: {fileID: 1876838810}
 --- !u!1 &305985487
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,6 +713,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreLabel: {fileID: 1434052841}
+  targetPlatform: {fileID: 296765281}
 --- !u!4 &399702301
 Transform:
   m_ObjectHideFlags: 0
@@ -1990,7 +1992,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1876838811
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2032,7 +2034,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.09803922}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.02745098}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
