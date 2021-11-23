@@ -16,7 +16,6 @@ public class Rocket : MonoBehaviour
     private float rotationRate = 10.0f;
     private int points = 0;
     private float stabilizingTime = 0.0f;
-    private float winTime = 0.0f;
     private bool waitingForStability = false;
     public Text scoreLabel;
     public TargetPlatform targetPlatform;
