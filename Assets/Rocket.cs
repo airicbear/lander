@@ -10,14 +10,21 @@ public class Rocket : MonoBehaviour
     private Rigidbody2D rb;
     private Transform tf;
     private bool isThrusting = false;
-    private float force = 1.0f;
-    private float forceRate = 5.0f;
+    private float initialForce = 15.0f;
+    private float initialForceRate = 10.0f;
+    private float force = 0.0f;
+    private float forceRate = 0.0f;
+    private float forceRateRate = 10.0f;
+    private float maxForceRate = 50.0f;
     private float maxForce = 30.0f;
     private float rotationRate = 10.0f;
     private int points = 0;
     private float stabilizingTime = 0.0f;
     private bool waitingForStability = false;
+    private Vector3 direction = Vector3.zero;
     public Text scoreLabel;
+    public Text forceLabel;
+    public Text directionLabel;
     public TargetPlatform targetPlatform;
 
     private void Start()
@@ -29,11 +36,24 @@ public class Rocket : MonoBehaviour
     }
 
     private void Thrust() {
-        rb.AddRelativeForce(Vector2.up * force);
+        rb.AddRelativeForce(Vector2.up * (force + initialForce));
 
         if (force < maxForce)
         {
+            if (forceRate < maxForceRate)
+            {
+                forceRate += Time.deltaTime * forceRateRate;
+            }
+            else
+            {
+                forceRate = maxForceRate;
+            }
+
             force += Time.deltaTime * forceRate;
+        }
+        else
+        {
+            force = maxForce;
         }
     }
 
@@ -46,29 +66,32 @@ public class Rocket : MonoBehaviour
     }
 
     public void TurnLeft() {
-        tf.Rotate(Vector3.forward * rotationRate * Time.deltaTime);
+        directionLabel.text = "Turning Left";
+        direction = Vector3.forward;
     }
 
     public void TurnRight() {
-        tf.Rotate(Vector3.back * rotationRate * Time.deltaTime);
+        directionLabel.text = "Turning Right";
+        direction = Vector3.back;
     }
 
-    private void Update()
-    {
+    public void StopTurning() {
+        direction = Vector3.zero;
+    }
+
+    private void FixedUpdate() {
         if (isThrusting) {
             Thrust();
         } else {
             force = 0;
+            forceRate = initialForceRate;
         }
 
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            TurnLeft();
-        }
+        tf.Rotate(direction * rotationRate * Time.deltaTime);
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (direction == Vector3.zero)
         {
-            TurnRight();
+            directionLabel.text = "Forward";
         }
 
         if (IsUpsideDown() && rb.velocity == Vector2.zero)
@@ -89,8 +112,19 @@ public class Rocket : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (isThrusting) {
+            forceLabel.text = $"Force: {force.ToString("N1")} N";
+        } else {
+            forceLabel.text = "Standby";
+        }
+    }
+
     public void Reset()
     {
+        direction = Vector3.zero;
+        force = 0;
         stabilizingTime = 0;
         tf.position = initPos;
         tf.eulerAngles = initRot;
@@ -126,7 +160,11 @@ public class Rocket : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision) {
         if (collision.collider.tag.Equals("TargetPlatform")) {
             waitingForStability = true;
-        } else {
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision) {
+        if (collision.collider.tag.Equals("TargetPlatform")) {
             waitingForStability = false;
             stabilizingTime = 0;
         }
