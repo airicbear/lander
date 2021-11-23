@@ -29,6 +29,7 @@ public class Rocket : MonoBehaviour
 
     private void Start()
     {
+        Input.backButtonLeavesApp = true;
         rb = this.GetComponent<Rigidbody2D>();
         tf = this.GetComponent<Transform>();
         initPos = this.transform.position;
