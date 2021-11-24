@@ -18,4 +18,8 @@ public class TargetPlatform : MonoBehaviour
     public void ChangeLocation() {
         this.transform.position = GetRandomLocation();
     }
+
+    public void PlaySound() {
+        GetComponent<AudioSource>().Play();
+    }
 }

@@ -22,6 +22,7 @@ public class Rocket : MonoBehaviour
     private float stabilizingTime = 0.0f;
     private bool waitingForStability = false;
     private Vector3 direction = Vector3.zero;
+    public GameObject body;
     public Text scoreLabel;
     public Text forceLabel;
     public Text directionLabel;
@@ -77,13 +78,18 @@ public class Rocket : MonoBehaviour
     }
 
     public void StopTurning() {
+        body.GetComponent<AudioSource>().Stop();
         direction = Vector3.zero;
     }
 
     private void FixedUpdate() {
         if (isThrusting) {
             Thrust();
+            if (!GetComponent<AudioSource>().isPlaying) {
+                GetComponent<AudioSource>().Play();
+            }
         } else {
+            GetComponent<AudioSource>().Stop();
             force = 0;
             forceRate = initialForceRate;
         }
@@ -92,7 +98,12 @@ public class Rocket : MonoBehaviour
 
         if (direction == Vector3.zero)
         {
+            body.GetComponent<AudioSource>().Stop();
             directionLabel.text = "Forward";
+        }
+        else if (!body.GetComponent<AudioSource>().isPlaying)
+        {
+            body.GetComponent<AudioSource>().Play();
         }
 
         if (IsUpsideDown() && rb.velocity == Vector2.zero)
@@ -146,6 +157,7 @@ public class Rocket : MonoBehaviour
     }
 
     private void WinPoint() {
+        targetPlatform.PlaySound();
         points++;
         scoreLabel.text = points.ToString();
     }
